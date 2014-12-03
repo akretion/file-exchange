@@ -84,7 +84,7 @@ For 'Export' direction, choose Export value"/>
                         attrs="{'invisible': [('type', '=', 'filestore')]}"
                         password="True"/>
                 </group>
-                <group name="tasks">
+                <group name="tasks" string="Tasks">
                     <field name="task_ids" nolabel="1"
                            context="{'active_test': False}">
                     </field>
