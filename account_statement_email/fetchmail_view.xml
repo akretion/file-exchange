@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  account_statement_email for OpenERP
+  Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
+  The licence is in the file __openerp__.py
+-->
+
+<openerp>
+    <data>
+    
+        <!-- INHERITED VIEW FOR THE OBJECT : fetchmail.server -->
+
+        <record id="fetchmail_server_view_form" model="ir.ui.view">
+            <field name="name">account_statement_email.fetchmail.server.view_form</field>
+            <field name="model">fetchmail.server</field>
+            <field name="inherit_id" ref="file_email.view_email_server_form" />
+            <field eval="16" name="priority"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="file_type" position="after">
+                    <field name="profile_id" attrs="{'invisible': [('file_type','!=', 'bank_statement')]}"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
