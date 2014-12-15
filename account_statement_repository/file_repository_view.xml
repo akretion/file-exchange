@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+        <!-- INHERITED VIEW FOR THE OBJECT : repository_task -->
+
+        <record id="view_repository_task_form" model="ir.ui.view">
+            <field name="name">bank_statement_repository.repository_task.view_form</field>
+            <field name="model">repository.task</field>
+            <field name="inherit_id" ref="file_repository.view_repository_task_form" />
+            <field name="arch" type="xml">
+                <data>
+                    <field name="active" position="after">
+                        <field name="statement_profile_id"
+                               attrs="{'invisible':[('type', '!=', 'bank_statement')],
+                                       'required':[('type', '=', 'bank_statement')]}"/>
+                    </field>
+                </data>
+            </field>
+        </record>
+
+    </data>
+</openerp>
