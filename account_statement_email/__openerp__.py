@@ -31,7 +31,7 @@
     'depends': ['account_statement_file_document', 'file_email'], 
     'init_xml': [],
     'update_xml': [ 
-           'fetchmail_view.xml',
+           'file_document_condition.xml',
     ],
     'demo_xml': [],
     'installable': True,

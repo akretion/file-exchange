@@ -3,7 +3,7 @@
 #
 #   account_statement_email for OpenERP
 #   Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
-#   @author Sébastien BEAU <sebastien.beau@akretion.com>
+#   @author Florian da Costa <florian.dacosta@akretion.com>
 #
 #   This program is free software: you can redistribute it and/or modify
 #   it under the terms of the GNU Affero General Public License as
@@ -22,19 +22,20 @@
 
 from openerp.osv import fields, orm
 
-class fetchmail_server(orm.Model):
-    _inherit = "fetchmail.server"
+class file_document(orm.Model):
+    _inherit = "file.document"
 
-    def get_file_type(self, cr, uid, context=None):
-        res = super(fetchmail_server, self).get_file_type(cr, uid, context=context)
-        res.append(('bank_statement', 'Bank Statement'))
-        return res
+    def _get_file_document_data(self, cr, uid, condition, msg, att, context=None):
+        vals = super(file_document, self)._get_file_document_data(cr, uid, condition, msg, att, context=context)
+        if condition.profile_id:
+            vals['statement_profile_id'] = condition.profile_id.id
+        return vals
 
-    def get_context_for_server(self, cr, uid, server_id, context=None):
-        server = self.browse(cr, uid, server_id, context=context)
-        ctx = super(fetchmail_server, self).get_context_for_server(cr, uid, server_id, context=context)
-        if server.file_type == 'bank_statement':
-            ctx['default_file_document_vals'] = {
-                    'file_type': 'bank_statement',
-                    }
-        return ctx
+class file_document_condition(orm.Model):
+    _inherit = "file.document.condition"
+
+    _columns = {
+        'profile_id': fields.many2one('account.statement.profile', 'Bank Statement Profile'),
+    }
+
+

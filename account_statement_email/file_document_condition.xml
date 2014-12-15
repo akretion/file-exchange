@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  account_statement_email for OpenERP
+  Copyright (C) 2012-TODAY Akretion <http://www.akretion.com>.
+  The licence is in the file __openerp__.py
+-->
+
+<openerp>
+    <data>
+    
+        <!-- INHERITED VIEW FOR THE OBJECT : fetchmail.server -->
+
+        <record id="email_condition_profile_view_form" model="ir.ui.view">
+            <field name="name">account_statement_email.email_condition.view_form</field>
+            <field name="model">file.document.condition</field>
+            <field name="inherit_id" ref="file_email.view_file_document_condition_form" />
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <field name="server_id" position="after">
+                    <field name="profile_id"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="email_condition_profile_view_tree" model="ir.ui.view">
+            <field name="name">account_statement_email.email_condition.view_form</field>
+            <field name="model">file.document.condition</field>
+            <field name="inherit_id" ref="file_email.view_file_document_condition_tree" />
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <field name="server_id" position="after">
+                    <field name="profile_id"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>
