@@ -122,12 +122,14 @@ class file_document(orm.Model):
         """
         Run the process for each file document
         """
+        if context is None:
+            context = {}
         for file_id in ids:
             try:
                 filedocument = self.browse(cr, uid, file_id, context=context)
                 self._run(cr, uid, filedocument, context=context)
                 if filedocument.direction == 'input':
-                    filedocument.done()
+                    filedocument.done(context=context)
             except Exception, e:
                 cr.rollback()
                 _logger.exception(e)
