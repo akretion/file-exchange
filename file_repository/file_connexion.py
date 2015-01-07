@@ -27,6 +27,9 @@ import os
 import paramiko
 import errno
 import functools
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def open_and_close_connection(func):
@@ -111,27 +114,46 @@ class FileConnection(object):
         self.persistant = False
 
     def connect(self):
+        logger.info(
+            'Starting new connection on %s port %d'
+            % (self.location, self.port))
         if self.is_('ftp'):
             self.connection = ftplib.FTP(self.location, self.port)
+            logger.info('Starting FTP authentication')
             self.connection.login(self.user, self.pwd)
+            logger.info('Successfull authentication')
         elif self.is_('sftp'):
             transport = paramiko.Transport((self.location, self.port or 22))
+            logger.info('Starting SSH authentication')
             transport.connect(username=self.user, password=self.pwd)
             self.connection = paramiko.SFTPClient.from_transport(transport)
+            logger.info('Successfull authentication')
 
     def close(self):
         if self.is_('ftp') or self.is_('sftp') and self.connection is not None:
             self.connection.close()
+            logger.info('The connexion has been closed')
 
     @open_and_close_connection
     def send(self, filepath, filename, output_file, create_patch=None):
-        if not filepath: filepath = ''
+        logger.info(
+            'Starting to send filename %s with filepath %s'
+            % (filename, filepath))
+        if not filepath:
+            filepath = ''
         if self.is_('ftp'):
             filepath = os.path.join(self.home_folder, filepath)
+            # TODO : before creating a new dir on the remote server
+            # we should make sure that it doesn't already exists, no ???
             if self.allow_dir_creation:
+                logger.info('Creating new remote directory %s' % filepath)
                 self.connection.mkdirs(filepath)
+            logger.info('Changing to directory %s' % filepath)
             self.connection.cwd(filepath)
+            logger.info(
+                'Starting to send file %s' % filename)
             self.connection.storbinary('STOR ' + filename, output_file)
+            logger.info('File has been sent')
         elif self.is_('sftp'):
             if not os.path.isabs(filepath):
                 filepath = os.path.join(self.home_folder, filepath)
@@ -154,7 +176,8 @@ class FileConnection(object):
 
     @open_and_close_connection
     def get(self, filepath, filename):
-        if not filepath: filepath = ''
+        if not filepath:
+            filepath = ''
         if self.is_('ftp') or self.is_('sftp'):
             outfile = TemporaryFile('w+b')
             if self.is_('ftp'):
@@ -171,7 +194,8 @@ class FileConnection(object):
 
     @open_and_close_connection
     def search(self, filepath, filename):
-        if not filepath: filepath = ''
+        if not filepath:
+            filepath = ''
         if filename is False:
             raise NoFileNameExcept("Filename is not defined")
         if self.is_('ftp'):

@@ -49,35 +49,40 @@
     <field name="model">file.document</field>
     <field name="arch" type="xml">
         <form string="File Document">
-            <field name="name"/>
-            <field name="datas" filename="datas_fname"/>
-            <field name="sequence"/>
-            <field name="date" />
-            <field name="datas_fname" invisible="1"/>
-            <field name="ext_id" />
-            <field name="active"/>
-            <field name="direction" readonly="1" />
-            <field name="file_type"/>
-            <field name="state"/>
-            <field name="company_id" widget="selection"
+            <header>
+                <field name="state" widget="statusbar"/>
+            </header>
+            <group name="main">
+                <field name="name"/>
+                <field name="datas" filename="datas_fname"/>
+                <field name="sequence"/>
+                <field name="date" />
+                <field name="datas_fname" invisible="1"/>
+                <field name="ext_id" />
+                <field name="active"/>
+                <field name="direction" readonly="1" />
+                <field name="file_type"/>
+                <field name="company_id" widget="selection"
                    groups="base.group_multi_company"/>
-            <newline />
-            <button name="run" string="Run" colspan="2" type="object"
-                    attrs="{'invisible':[('state','in', ('running','done'))]}"/>
-            <newline />
-            <button name="check_state" string="Check state" colspan="2"
-                    type="object"
-                    attrs="{'invisible':[('state','!=', 'running')]}"/>
-            <newline />
-            <group name="output_response" colspan="4"
-                   attrs="{'invisible': [('direction', '=', 'input')]}">
-                <separator string="External application response"/>
             </group>
-            <group name="input_response" colspan="4"
-                   attrs="{'invisible': ['|', ('direction', '=', 'output'), ('state', '!=', 'fail')]}">
-                <separator string="Fail message"/>
+            <group name="buttons">
+                <button name="run" string="Run" colspan="2" type="object"
+                        attrs="{'invisible':[('state','in', ('running','done'))]}"/>
+                <button name="check_state" string="Check state" colspan="2"
+                        type="object"
+                        attrs="{'invisible':[('state','!=', 'running')]}"/>
             </group>
-            <field name="response" nolabel="1" readonly="1" colspan="4" />
+            <group name="response">
+                <group name="output_response" colspan="2"
+                       attrs="{'invisible': [('direction', '=', 'input')]}">
+                    <separator string="External application response"/>
+                </group>
+                <group name="input_response" colspan="2"
+                       attrs="{'invisible': ['|', ('direction', '=', 'output'), ('state', '!=', 'fail')]}" string="External application response">
+                    <separator string="Fail message"/>
+                </group>
+                <field name="response" readonly="1" />
+            </group>
         </form>
     </field>
 </record>
