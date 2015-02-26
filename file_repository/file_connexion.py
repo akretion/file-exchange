@@ -29,6 +29,8 @@ import errno
 import functools
 import logging
 
+from contextlib import contextmanager
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,19 +42,17 @@ def open_and_close_connection(func):
     """
     @functools.wraps(func)
     def wrapper(self, *args, **kwargs):
-        if self.persistant:
-            if not self.connection:
-                self.connect()
-            return func(self, *args, **kwargs)
-        else:
+        if self.persistant and not self.connection:
             self.connect()
-            try:
-                response = func(self, *args, **kwargs)
-            except:
-                raise
-            finally:
-                self.close()
-            return response
+
+        # either the connection is persistent,
+        # either we are in a 'connect_and_close' context manager
+        if self.connection:
+            return func(self, *args, **kwargs)
+
+        with self.connect_and_close():
+            response = func(self, *args, **kwargs)
+        return response
     return wrapper
 
 
@@ -113,10 +113,22 @@ class FileConnection(object):
         self.connection = None
         self.persistant = False
 
+    @contextmanager
+    def connect_and_close(self):
+        self.connect()
+        try:
+            yield
+        except:
+            raise
+        finally:
+            self.close()
+
     def connect(self):
         logger.info(
             'Starting new connection on %s port %d'
             % (self.location, self.port))
+        if self.connection:
+            raise Exception('Already connected')
         if self.is_('ftp'):
             self.connection = ftplib.FTP(self.location, self.port)
             logger.info('Starting FTP authentication')
@@ -132,6 +144,7 @@ class FileConnection(object):
     def close(self):
         if self.is_('ftp') or self.is_('sftp') and self.connection is not None:
             self.connection.close()
+            self.connection = None
             logger.info('The connexion has been closed')
 
     @open_and_close_connection

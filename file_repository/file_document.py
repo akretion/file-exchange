@@ -62,11 +62,12 @@ class FileDocument(orm.Model):
         decoded_datas = base64.decodestring(file_doc.datas)
         outfile.write(decoded_datas)
         outfile.seek(0)
-        connection.send(folder, filename, outfile)
-        if task.rename_after_send and filename != new_filename:
-            old_path = os.path.join(folder, filename)
-            new_path = os.path.join(folder, new_filename)
-            connection.rename(old_path, new_path)
+        with connection.connect_and_close():
+            connection.send(folder, filename, outfile)
+            if task.rename_after_send and filename != new_filename:
+                old_path = os.path.join(folder, filename)
+                new_path = os.path.join(folder, new_filename)
+                connection.rename(old_path, new_path)
         return outfile
 
     def _run(self, cr, uid, file_doc, context=None):
