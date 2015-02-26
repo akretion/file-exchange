@@ -212,9 +212,18 @@ class FileConnection(object):
 
     @open_and_close_connection
     def move(self, oldfilepath, newfilepath, filename):
+        oldpath = os.path.join(oldfilepath, filename)
+        newpath = os.path.join(newfilepath, filename)
+        self.rename(oldpath, newpath, with_home_folder=False)
+
+    @open_and_close_connection
+    def rename(self, oldfilepath, newfilepath, with_home_folder=True):
+        if with_home_folder:
+            oldfilepath = os.path.join(self.home_folder, oldfilepath)
+            newfilepath = os.path.join(self.home_folder, newfilepath)
+        logger.info('Rename filename %s to %s on %s',
+                    oldfilepath, newfilepath, self.location)
         if self.is_('ftp') or self.is_('sftp'):
-            self.connection.rename(os.path.join(oldfilepath, filename),
-                                   os.path.join(newfilepath, filename))
+            self.connection.rename(oldfilepath, newfilepath)
         elif self.is_('filestore'):
-            os.rename(os.path.join(oldfilepath, filename),
-                      os.path.join(newfilepath, filename))
+            os.rename(oldfilepath, newfilepath)
