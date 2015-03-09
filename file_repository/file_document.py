@@ -21,8 +21,11 @@
 #
 ###############################################################################
 
+import os
+import re
 from openerp.osv import fields, orm
 from openerp.addons.file_autotask_rel.file_document import add_task
+from openerp.tools.translate import _
 from tempfile import TemporaryFile
 import base64
 
@@ -40,11 +43,31 @@ class FileDocument(orm.Model):
 
     def export_file_document(self, cr, uid, connection, file_doc,
                              context=None):
+        task = file_doc.task_id
+        filename = file_doc.datas_fname
+        if task.rename_after_send:
+            # check if we can get the new filename before to send it
+            # so if the renaming fails, the file won't be send
+            try:
+                new_filename = task.get_rename_new_name(filename)
+            except re.error as err:
+                raise orm.except_orm(
+                    _('Error'),
+                    _('Cannot rename file with name %s. Please check the '
+                      'rename settings of the task %s. Error: %s') %
+                    (filename, task.name, err))
+
+        folder = task.folder or ''
         outfile = TemporaryFile('w+b')
         decoded_datas = base64.decodestring(file_doc.datas)
         outfile.write(decoded_datas)
         outfile.seek(0)
-        connection.send(file_doc.task_id.folder, file_doc.datas_fname, outfile)
+        with connection.connect_and_close():
+            connection.send(folder, filename, outfile)
+            if task.rename_after_send and filename != new_filename:
+                old_path = os.path.join(folder, filename)
+                new_path = os.path.join(folder, new_filename)
+                connection.rename(old_path, new_path)
         return outfile
 
     def _run(self, cr, uid, file_doc, context=None):

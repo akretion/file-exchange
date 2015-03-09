@@ -34,6 +34,24 @@ For 'Export' direction, choose Export value"/>
                     <field name="company_id" groups="base.group_multi_company"/>
                 </group>
             </group>
+            <group name="rename"
+              attrs="{'invisible': [('direction', '!=', 'out')]}">
+                <field name="rename_after_send"/>
+                <group name="rename_params" colspan="4"
+                  attrs="{'invisible': [('rename_after_send', '=', False)]}">
+                    <group colspan="4" col="4">
+                      <field name="rename_source_pattern" placeholder="([\w\.\d_]+).tmp"/>
+                      <field name="rename_target_pattern" placeholder="\1.ok"/>
+                      <label for="rename_source_demo"/>
+                      <div colspan="3">
+                      <field name="rename_source_demo" class="oe_inline"
+                        placeholder="20152602.test_001.tmp"/>
+                        becomes:
+                        <field name="rename_target_demo" class="oe_inline"/>
+                      </div>
+                    </group>
+                </group>
+            </group>
             <group name="cron">
                 <button name="create_cron_from_abstract"
                         type="object"

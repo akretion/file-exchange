@@ -20,6 +20,8 @@
 #
 ###############################################################################
 
+import re
+from openerp import models, api, exceptions
 from openerp.osv import fields, orm
 from openerp.tools.translate import _
 from .file_connexion import FileConnection
@@ -88,7 +90,7 @@ class FileRepository(orm.Model):
                                  "Check url, user & password.\n %s") % e)
 
 
-class RepositoryTask(orm.Model):
+class RepositoryTask(models.Model):
     _name = 'repository.task'
     _description = 'Repository Task'
     _inherit = 'abstrack.task'
@@ -120,11 +122,70 @@ class RepositoryTask(orm.Model):
             'Archive Folder',
             size=64,
             help="The file will be moved to this folder after import"),
+        'rename_after_send': fields.boolean(
+            string='Rename when the export is complete',
+        ),
+        'rename_source_pattern': fields.char(
+            string='Regex pattern',
+            help="A regular expression that matches a string.\n"
+                 "Example: (\w+)\.tmp",
+        ),
+        'rename_target_pattern': fields.char(
+            string='Substitution',
+            help="The name of the target file with references to regular "
+                 "expression groups of the source matches. References to "
+                 "groups are in the formed by \\ followed by the group number."
+                 "\nExample: \1.ok",
+        ),
+        'rename_source_demo': fields.char(
+            string='Filename Example',
+            help="Use this field to test how a filename would be renamed",
+        ),
+        'rename_target_demo': fields.char(
+            string='Result',
+            readonly=True,
+        ),
     }
 
     _defaults = {
         'company_id': lambda s, cr, uid, c: s.pool['res.company']._company_default_get(cr, uid, 'repository.task', context=c),
     }
+
+    @api.multi
+    def get_rename_new_name(self, source_name, raise_=True):
+        try:
+            pattern = re.compile(r"^%s$" % self.rename_source_pattern or '')
+        except re.error as err:
+            if raise_:
+                raise
+            else:
+                return _('Error in regex pattern: %s') % (err,)
+        try:
+            target_name = pattern.sub(self.rename_target_pattern or '',
+                                      source_name or '')
+        except re.error as err:
+            if raise_:
+                raise
+            else:
+                return _('Error in substitution: %s') % (err,)
+        return target_name
+
+    @api.constrains('rename_source_pattern', 'rename_target_pattern')
+    def check_rename_patterns(self):
+        try:
+            self.get_rename_new_name('')
+        except re.error as err:
+            raise exceptions.ValidationError(
+                _('Error in the regex or substitution pattern: %s') % (err,)
+            )
+
+    @api.onchange('rename_source_pattern',
+                  'rename_target_pattern',
+                  'rename_source_demo')
+    def onchange_rename_regex(self):
+        demo_name = self.rename_source_demo
+        self.rename_target_demo = self.get_rename_new_name(demo_name,
+                                                           raise_=False)
 
     def prepare_document_vals(self, cr, uid, task, file_name, datas,
                               context=None):
