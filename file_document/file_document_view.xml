@@ -97,8 +97,8 @@
             <field name="file_type"/>
             <field name="date"/>
             <field name="direction" string="direct."/>
-            <button name="run" string="Run"
-                    icon="gtk-go-forward" type="object"/>
+            <button string="Run the action according to direction (send or receive file)"
+                    name="run" icon="gtk-go-forward" type="object"/>
         </tree>
     </field>
 </record>
