@@ -132,7 +132,8 @@ class FileConnection(object):
         if self.is_('ftp'):
             self.connection = ftplib.FTP(self.location, self.port)
             logger.info('Starting FTP authentication')
-            self.connection.login(self.user, self.pwd)
+            # ftplib doesn't support unicode
+            self.connection.login(self.user, self.pwd.encode('utf-8'))
             logger.info('Successfull authentication')
         elif self.is_('sftp'):
             transport = paramiko.Transport((self.location, self.port or 22))
