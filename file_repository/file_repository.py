@@ -159,7 +159,7 @@ class RepositoryTask(orm.Model):
                                        context=context)
         folder_path = get_full_path(task.repository_id.home_folder, task.folder)
         for file_name in connection.search(folder_path, task.file_name):
-            if not file_name in file_names:
+            if file_name not in file_names:
                 self.import_one_document(cr, uid, connection, task, file_name,
                                          folder_path, context=context)
         return True
@@ -179,7 +179,7 @@ class RepositoryTask(orm.Model):
             connection = repo_obj.repository_connection(cr, uid,
                                                         task.repository_id.id,
                                                         context=context)
-            #only support the import for now
+            # only support the import for now
             if task.direction == 'in':
                 _logger.info('Start to run import task %s' % task.name)
                 self.run_import(cr, uid, connection, task, context=context)
