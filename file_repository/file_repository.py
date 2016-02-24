@@ -134,7 +134,8 @@ class RepositoryTask(orm.Model):
                 'direction': 'input',
                 'task_id': self._name+','+str(task.id),
                 'datas': datas,
-                'datas_fname': file_name
+                'datas_fname': file_name,
+                'file_type': task.type,
                 }
 
     def import_one_document(self, cr, uid, connection, task, file_name,
