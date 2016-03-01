@@ -138,6 +138,12 @@ class RepositoryTask(orm.Model):
                 'file_type': task.type,
                 }
 
+    def move_file(self, cr, uid, connection, task, file_name,
+                  folder_path, context=None):
+        "Override me"
+        if task.archive_folder:
+            connection.move(folder_path, task.archive_folder, file_name)
+
     def import_one_document(self, cr, uid, connection, task, file_name,
                             folder_path, context=None):
         document_obj = self.pool['file.document']
@@ -147,8 +153,8 @@ class RepositoryTask(orm.Model):
         vals = self.prepare_document_vals(cr, uid, task, file_name,
                                           datas_encoded, context=context)
         document_obj.create(cr, uid, vals, context=context)
-        if task.archive_folder:
-            connection.move(folder_path, task.archive_folder, file_name)
+        self.move_file(
+            cr, uid, connection, task, file_name, folder_path, context=context)
         return True
 
     def run_import(self, cr, uid, connection, task, context=None):

@@ -188,10 +188,12 @@ class FileConnection(object):
         return [x for x in connection_list_result if filename in x]
 
     @open_and_close_connection
-    def move(self, oldfilepath, newfilepath, filename):
+    def move(self, oldfilepath, newfilepath, filename, new_filename=None):
+        if not new_filename:
+            new_filename = filename
         if self.is_('ftp') or self.is_('sftp'):
             self.connection.rename(os.path.join(oldfilepath, filename),
-                                   os.path.join(newfilepath, filename))
+                                   os.path.join(newfilepath, new_filename))
         elif self.is_('filestore'):
             os.rename(os.path.join(oldfilepath, filename),
-                      os.path.join(newfilepath, filename))
+                      os.path.join(newfilepath, new_filename))
