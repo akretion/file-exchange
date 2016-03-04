@@ -72,7 +72,7 @@ class FileRepository(orm.Model):
         ('name_uniq', 'unique (name)', 'Repository names must be unique !')
     ]
 
-    def repository_connection(self, cr, uid, id, context=None):
+    def repository_connection(self, cr, uid, id, persistant=False, context=None):
         if isinstance(id, list):
             id = id[0]
         repository = self.browse(cr, uid, id, context=context)
@@ -81,7 +81,8 @@ class FileRepository(orm.Model):
                                   repository.username, repository.password,
                                   port=repository.port,
                                   allow_dir_creation=True,
-                                  home_folder=repository.home_folder)
+                                  home_folder=repository.home_folder,
+                                  persistant=persistant)
         except Exception, e:
             raise orm.except_orm(_("Repository Connection Error"),
                                  _("Could not connect to repository\n"
