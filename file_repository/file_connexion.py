@@ -197,3 +197,19 @@ class FileConnection(object):
         elif self.is_('filestore'):
             os.rename(os.path.join(oldfilepath, filename),
                       os.path.join(newfilepath, new_filename))
+
+    @open_and_close_connection
+    def delete(self, filepath, filename):
+        if not filepath: filepath = ''
+        if filename is False:
+            raise NoFileNameExcept("Filename is not defined")
+        if self.is_('ftp'):
+            self.connection.cwd(filepath)
+            # Take care that ftp lib use utf-8 and not unicode
+            filename = filename.encode('utf-8')
+            self.connection.delete(filename)
+        elif self.is_('sftp'):
+            self.connection.chdir(filepath)
+            self.connection.remove(filename)
+        elif self.is_('filestore'):
+            os.remove(os.path.join(filepath, filename))
