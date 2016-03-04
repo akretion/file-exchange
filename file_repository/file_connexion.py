@@ -108,7 +108,7 @@ class FileConnection(object):
         self.user = user
         self.pwd = pwd
         self.connection = None
-        self.persistant = False
+        self.persistant = persistant
 
     def connect(self):
         if self.is_('ftp'):
