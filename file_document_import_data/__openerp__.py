@@ -24,7 +24,9 @@
     'version': '0.1',
     'category': 'Generic Modules/Others',
     'license': 'AGPL-3',
-    'description': """empty""",
+    'description': """
+        Allow to make a native odoo import from a file document.
+    """,
     'author': 'Akretion',
     'website': 'http://www.akretion.com/',
     'depends': ['base_import', 'file_document'],

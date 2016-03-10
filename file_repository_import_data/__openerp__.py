@@ -26,6 +26,9 @@
     'category': 'Generic Modules/Others',
     'license': 'AGPL-3',
     'description': """
+        Add a type on repository task in order to pass it to file document
+        and be able to do a odoo native import from a file on a distant
+        server.
     """,
     'author': 'Akretion',
     'website': 'http://www.akretion.com/',
