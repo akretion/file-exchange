@@ -33,7 +33,7 @@ class FileDocument(orm.Model):
         return res
 
     _columns = {
-        'import_model': fields.char('Model')
+        'import_model': fields.many2one('ir.model', 'Model')
     }
 
     def get_import_file_format(self, cr, uid, context=None):
@@ -53,7 +53,7 @@ class FileDocument(orm.Model):
             options = self.get_import_file_format(cr, uid, context=context)
 
             import_vals = {
-                'res_model': filedocument.import_model,
+                'res_model': filedocument.import_model.model,
                 'file': base64.b64decode(filedocument.datas),
                 'file_name': filedocument.datas_fname,
             }

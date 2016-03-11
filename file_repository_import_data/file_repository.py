@@ -26,7 +26,7 @@ class RepositoryTask(orm.Model):
     _inherit = "repository.task"
 
     _columns = {
-        'import_model': fields.char('Model')
+        'import_model': fields.many2one('ir.model', 'Model')
     }
 
     def prepare_document_vals(self, cr, uid, task, file_name, datas,
@@ -35,5 +35,5 @@ class RepositoryTask(orm.Model):
             cr, uid, task, file_name, datas, context=context)
         if task.type == 'import_data':
             vals.update({'file_type': task.type,
-                         'import_model': task.import_model})
+                         'import_model': task.import_model.id})
         return vals
