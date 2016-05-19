@@ -133,7 +133,8 @@ class file_document(orm.Model):
             except Exception, e:
                 cr.rollback()
                 _logger.exception(e)
-                filedocument.write({'state': 'fail', 'response': unicode(e)})
+                # filedocument.write({'state': 'fail', 'response': unicode(e)})
+                filedocument.write({'state': 'fail', 'response': e})
                 cr.commit()
             else:
                 cr.commit()
