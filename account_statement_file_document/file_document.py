@@ -47,7 +47,7 @@ class file_document(orm.Model):
             ctx = context.copy()
             ctx['default_file_id'] = filedocument.id
             (shortname, ftype) = os.path.splitext(filedocument.datas_fname)
-            acc_profile_obj.multi_statement_import(
+            acc_profile_obj.statement_import(
                                             cr,
                                             uid,
                                             False,
